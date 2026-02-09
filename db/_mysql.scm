@@ -125,7 +125,7 @@ static void ffi_mysql_close (int fd);
 static unsigned long* ffi_mysql_make_ulong_ptr ();
 static void ffi_mysql_long_ptr_set (long* ptr, long val);
 static long long* ffi_mysql_make_bigint_ptr ();
-static void ffi_mysql_bigint_ptr_set (long long* ptr, long val);
+static void ffi_mysql_bigint_ptr_set (long long* ptr, long long val);
 static float* ffi_mysql_make_float_ptr ();
 static void ffi_mysql_float_ptr_set (float* ptr, float val);
 static double* ffi_mysql_make_double_ptr ();
@@ -642,6 +642,7 @@ int ffi_mysql_start_connection_thread (int ifd, int ofd)
   return -r;
  }
 
+ pthread_detach (thread);
  return 0;
 }
 
@@ -678,6 +679,7 @@ MYSQL_BIND* ffi_mysql_make_bind (unsigned count)
 {
  size_t sz = count * sizeof (MYSQL_BIND);
  MYSQL_BIND* res = malloc (sz);
+ if (!res) return NULL;
  memset (res, 0, sz);
  return res;
 }
@@ -702,12 +704,12 @@ void ffi_mysql_bind_set_long (MYSQL_BIND* mybind, int k, long* ptr)
 {
  mybind[k].buffer_type = MYSQL_TYPE_LONG;
  mybind[k].buffer = ptr;
- mybind[k].buffer_length = sizeof (long);
+ mybind[k].buffer_length = sizeof (int);
 }
 
 long ffi_mysql_bind_get_long (MYSQL_BIND* mybind, int k)
 {
- return *((long*)mybind[k].buffer);
+ return (long)*((int*)mybind[k].buffer);
 }
 
 void ffi_mysql_bind_set_bigint (MYSQL_BIND* mybind, int k, long long* ptr)
@@ -877,7 +879,7 @@ long long* ffi_mysql_make_bigint_ptr ()
  return res;
 }
 
-void ffi_mysql_bigint_ptr_set (long long* ptr, long val)
+void ffi_mysql_bigint_ptr_set (long long* ptr, long long val)
 {
  *ptr = val;
 }

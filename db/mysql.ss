@@ -170,7 +170,7 @@
                    (loop ptr))))
               ((real? arg)
                (let (ptr (check-ptr (make_double_ptr)))
-                 (double_ptr_set (exact->inexact arg))
+                 (double_ptr_set ptr (exact->inexact arg))
                  (mysql_bind_set_double bind k ptr)
                  (loop ptr)))
               ((string? arg)
@@ -383,7 +383,7 @@
               (let (len (maybe-null (mysql_bind_get_len res k)))
                 (if len
                   (let* ((bind (check-ptr (make_mysql_bind 1)))
-                         (ptr (check-ptr (make_blob_ptr)))
+                         (ptr (check-ptr (make_blob_ptr len)))
                          (_ (mysql_bind_set_blob bind 0 ptr len))
                          (r (mysql_stmt_fetch_column mystmt bind k 0)))
                     (if (##fxzero? r)
